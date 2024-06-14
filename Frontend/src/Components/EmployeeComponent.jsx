@@ -1,18 +1,31 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { createEmployee } from '../Services/EmployeeService';
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 const EmployeeComponent = () => {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [email, setEmail] = useState('');
-
     const navigator = useNavigate();
+    const { id } = useParams();
+
     const [error, setError] = useState({
         firstName: '',
         lastName: '',
         email: ''
     })
+
+    useEffect(()=>{
+        if(id){
+            getEmployee(id) 
+            .then((res)=>{
+                setFirstName(res.data.firstName);
+                setLastName(res.data.lastName);
+                setEmail(res.data.email);
+            })
+        }
+    },[id])
+
     function handleFirstName(e) {
         setFirstName(e.target.value);
     }
@@ -58,12 +71,24 @@ const EmployeeComponent = () => {
         }
         return isValid;
     }
+
+    function pageTitle() {
+        if (id) {
+            return <h2 className='text-center mt-5'>Update Employee</h2>
+        }
+        else {
+            return <h2 className='text-center mt-5'>Add Employee</h2>
+        }
+    }
+
     return (
         <div className="component">
             <br /><br />
             <div className="row">
                 <div className="card col-md-6 offset-md-3 offset-md-3">
-                    <h2 className='text-center mt-5'>Add Employee</h2>
+                    {
+                        pageTitle()
+                    }
                     <div className="card-body">
                         <form onSubmit={saveEmployee}>
                             <div className="form-group mb-2">
